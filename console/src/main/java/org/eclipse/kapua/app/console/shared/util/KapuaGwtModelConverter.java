@@ -31,6 +31,7 @@ import org.eclipse.kapua.app.console.shared.model.GwtPermission.GwtAction;
 import org.eclipse.kapua.app.console.shared.model.GwtPermission.GwtDomain;
 import org.eclipse.kapua.app.console.shared.model.GwtTopic;
 import org.eclipse.kapua.app.console.shared.model.GwtUpdatableEntityModel;
+import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceUserCouplingMode;
 import org.eclipse.kapua.app.console.shared.model.account.GwtAccount;
 import org.eclipse.kapua.app.console.shared.model.authentication.GwtCredential;
 import org.eclipse.kapua.app.console.shared.model.authentication.GwtSubjectType;
@@ -547,6 +548,17 @@ public class KapuaGwtModelConverter {
         gwtDevice.setCustomAttribute4(device.getCustomAttribute4());
         gwtDevice.setCustomAttribute5(device.getCustomAttribute5());
         gwtDevice.setOptlock(device.getOptlock());
+
+        String deviceUserCouplingBound = "N/A";
+        if (device.getDeviceUserCouplingBound() != null) {
+            GwtDeviceUserCouplingMode gwtDeviceUserCouplingMode = GwtDeviceUserCouplingMode.valueOf(device.getDeviceUserCouplingBound().name());
+            if (gwtDeviceUserCouplingMode != null) {
+                deviceUserCouplingBound = gwtDeviceUserCouplingMode.getLabel();
+            }
+        }
+        gwtDevice.setDeviceUserCouplingMode(deviceUserCouplingBound);
+        gwtDevice.setLastUserId(convert(device.getLastUserId()));
+        gwtDevice.setReservedUserId(convert(device.getReservedUserId()));
 
         // Last device event
         if (device.getLastEvent() != null) {

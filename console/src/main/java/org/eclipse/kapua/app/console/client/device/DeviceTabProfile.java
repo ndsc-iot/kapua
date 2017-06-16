@@ -106,8 +106,6 @@ public class DeviceTabProfile extends LayoutContainer {
                 if (value != null) {
                     if ("devLastEventOn".equals(model.getName()) && !"N/A".equals(value)) {
                         return DateUtils.formatDateTime(new Date((Long) value));
-                    } else if ("devSecurityAllowCredentialsChange".equals(model.getName())) {
-                        return (Boolean) value ? MSGS.yes() : MSGS.no();
                     }
                 }
                 return value;

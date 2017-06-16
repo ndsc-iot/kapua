@@ -14,6 +14,7 @@ package org.eclipse.kapua.service.device.registry.common;
 import java.util.List;
 
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.KapuaIllegalArgumentException;
 import org.eclipse.kapua.commons.model.query.predicate.AttributePredicate;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.util.ArgumentValidator;
@@ -34,6 +35,7 @@ import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DevicePredicates;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.internal.DeviceDomain;
 
 /**
@@ -104,6 +106,15 @@ public final class DeviceValidation {
             ArgumentValidator.notNull(groupService.find(deviceCreator.getScopeId(), deviceCreator.getGroupId()), "deviceCreator.groupId");
         }
 
+        if (DeviceUserCouplingMode.LOOSE.equals(deviceCreator.getDeviceUserCouplingBound()) &&
+                deviceCreator.getReservedUserId() != null) {
+            throw new KapuaIllegalArgumentException("device.deviceUserCouplingBound", DeviceUserCouplingMode.LOOSE.name());
+        }
+        if (DeviceUserCouplingMode.STRICT.equals(deviceCreator.getDeviceUserCouplingBound()) &&
+                deviceCreator.getReservedUserId() == null) {
+            throw new KapuaIllegalArgumentException("device.deviceUserCouplingBound", DeviceUserCouplingMode.STRICT.name());
+        }
+
         authorizationService.checkPermission(permissionFactory.newPermission(DEVICE_DOMAIN, Actions.write, deviceCreator.getScopeId(), deviceCreator.getGroupId()));
 
         return deviceCreator;
@@ -120,6 +131,15 @@ public final class DeviceValidation {
         ArgumentValidator.notNull(device, "device");
         ArgumentValidator.notNull(device.getId(), "device.id");
         ArgumentValidator.notNull(device.getScopeId(), "device.scopeId");
+
+        if (DeviceUserCouplingMode.LOOSE.equals(device.getDeviceUserCouplingBound()) &&
+                device.getReservedUserId() != null) {
+            throw new KapuaIllegalArgumentException("device.deviceUserCouplingBound", DeviceUserCouplingMode.LOOSE.name());
+        }
+        if (DeviceUserCouplingMode.STRICT.equals(device.getDeviceUserCouplingBound()) &&
+                device.getReservedUserId() == null) {
+            throw new KapuaIllegalArgumentException("device.deviceUserCouplingBound", DeviceUserCouplingMode.STRICT.name());
+        }
 
         // Check that current user can manage the current group of the device
         KapuaId currentGroupId = findCurrentGroupId(device.getScopeId(), device.getId());

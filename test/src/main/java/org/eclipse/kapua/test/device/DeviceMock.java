@@ -19,7 +19,7 @@ import org.eclipse.kapua.KapuaException;
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.device.registry.Device;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.event.DeviceEvent;
@@ -366,30 +366,6 @@ public class DeviceMock implements Device {
     }
 
     @Override
-    public DeviceCredentialsMode getCredentialsMode() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setCredentialsMode(DeviceCredentialsMode credentialsMode) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public KapuaId getPreferredUserId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setPreferredUserId(KapuaId deviceUserId) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public KapuaId getConnectionId() {
         // TODO Auto-generated method stub
         return null;
@@ -435,6 +411,42 @@ public class DeviceMock implements Device {
     public <E extends DeviceEvent> E getLastEvent() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public DeviceUserCouplingMode getDeviceUserCouplingBound() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setDeviceUserCouplingBound(DeviceUserCouplingMode deviceUserCouplingMode) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public KapuaId getLastUserId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setLastUserId(KapuaId lastUserId) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public KapuaId getReservedUserId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setReservedUserId(KapuaId reservedUserId) {
+        // TODO Auto-generated method stub
+
     }
 
 }

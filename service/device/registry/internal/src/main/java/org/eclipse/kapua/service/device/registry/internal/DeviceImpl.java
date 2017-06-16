@@ -159,15 +159,21 @@ public class DeviceImpl extends AbstractKapuaUpdatableEntity implements Device {
     @Column(name = "custom_attribute_5")
     private String customAttribute5;
 
-    @Column(name = "credentials_mode")
-    @Enumerated(EnumType.STRING)
-    private DeviceCredentialsMode deviceCredentialsMode;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "eid", column = @Column(name = "last_user_id", nullable = true, updatable = true))
+    })
+    private KapuaEid lastUserId;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "eid", column = @Column(name = "preferred_user_id"))
+            @AttributeOverride(name = "eid", column = @Column(name = "reserved_user_id", nullable = true, updatable = true))
     })
-    private KapuaEid preferredUserId;
+    private KapuaEid reservedUserId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "device_user_coupling_mode")
+    private DeviceUserCouplingMode deviceUserCouplingMode;
 
     /**
      * Constructor
@@ -446,23 +452,33 @@ public class DeviceImpl extends AbstractKapuaUpdatableEntity implements Device {
     }
 
     @Override
-    public DeviceCredentialsMode getCredentialsMode() {
-        return deviceCredentialsMode;
+    public DeviceUserCouplingMode getDeviceUserCouplingBound() {
+        return deviceUserCouplingMode;
     }
 
     @Override
-    public void setCredentialsMode(DeviceCredentialsMode deviceCredentialsMode) {
-        this.deviceCredentialsMode = deviceCredentialsMode;
+    public void setDeviceUserCouplingBound(DeviceUserCouplingMode deviceUserCouplingMode) {
+        this.deviceUserCouplingMode = deviceUserCouplingMode;
     }
 
     @Override
-    public org.eclipse.kapua.model.id.KapuaId getPreferredUserId() {
-        return preferredUserId;
+    public KapuaId getLastUserId() {
+        return lastUserId;
     }
 
     @Override
-    public void setPreferredUserId(KapuaId preferredUserId) {
-        this.preferredUserId = KapuaEid.parseKapuaId(preferredUserId);
+    public void setLastUserId(KapuaId lastUserId) {
+        this.lastUserId = lastUserId != null ? new KapuaEid(lastUserId) : null;
+    }
+
+    @Override
+    public KapuaId getReservedUserId() {
+        return reservedUserId;
+    }
+
+    @Override
+    public void setReservedUserId(KapuaId reservedUserId) {
+        this.reservedUserId = reservedUserId != null ? new KapuaEid(reservedUserId) : null;
     }
 
     @Override

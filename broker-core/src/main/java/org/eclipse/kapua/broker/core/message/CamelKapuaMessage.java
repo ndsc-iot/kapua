@@ -13,6 +13,7 @@
 package org.eclipse.kapua.broker.core.message;
 
 import org.eclipse.kapua.broker.core.plugin.ConnectorDescriptor;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.message.KapuaMessage;
 import org.eclipse.kapua.model.id.KapuaId;
 
@@ -25,6 +26,7 @@ import org.eclipse.kapua.model.id.KapuaId;
  */
 public class CamelKapuaMessage<M extends KapuaMessage<?, ?>> {
 
+    private KapuaSession kapuaSession;
     private M message;
     private KapuaId connectionId;
     private ConnectorDescriptor connectorDescriptor;
@@ -32,14 +34,28 @@ public class CamelKapuaMessage<M extends KapuaMessage<?, ?>> {
     /**
      * Constructs a new Camel Kapua message
      *
-     * @param message             message
-     * @param connectionId        connection id
-     * @param connectorDescriptor connector descriptor
+     * @param kapuaSession
+     *            kapua session
+     * @param message
+     *            message
+     * @param connectionId
+     *            connection id
+     * @param connectorDescriptor
+     *            connector descriptor
      */
-    public CamelKapuaMessage(M message, KapuaId connectionId, ConnectorDescriptor connectorDescriptor) {
+    public CamelKapuaMessage(KapuaSession kapuaSession, M message, KapuaId connectionId, ConnectorDescriptor connectorDescriptor) {
+        this.kapuaSession = kapuaSession;
         this.connectionId = connectionId;
         this.message = message;
         this.connectorDescriptor = connectorDescriptor;
+    }
+
+    public KapuaSession getKapuaSession() {
+        return kapuaSession;
+    }
+
+    public void setKapuaSession(KapuaSession kapuaSession) {
+        this.kapuaSession = kapuaSession;
     }
 
     public M getMessage() {

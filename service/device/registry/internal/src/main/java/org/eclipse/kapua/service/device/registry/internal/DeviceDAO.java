@@ -63,8 +63,9 @@ public class DeviceDAO extends ServiceDAO {
         device.setCustomAttribute3(deviceCreator.getCustomAttribute3());
         device.setCustomAttribute4(deviceCreator.getCustomAttribute4());
         device.setCustomAttribute5(deviceCreator.getCustomAttribute5());
-        device.setCredentialsMode(deviceCreator.getCredentialsMode());
-        device.setPreferredUserId(deviceCreator.getPreferredUserId());
+        device.setDeviceUserCouplingBound(deviceCreator.getDeviceUserCouplingBound());
+        device.setLastUserId(deviceCreator.getLastUserId());
+        device.setReservedUserId(deviceCreator.getReservedUserId());
 
         device.setConnectionId(deviceCreator.getConnectionId());
         device.setLastEventId(deviceCreator.getLastEventId());

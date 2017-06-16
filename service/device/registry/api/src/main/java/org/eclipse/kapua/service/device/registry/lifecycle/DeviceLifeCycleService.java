@@ -12,6 +12,7 @@
 package org.eclipse.kapua.service.device.registry.lifecycle;
 
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.message.device.lifecycle.KapuaAppsMessage;
 import org.eclipse.kapua.message.device.lifecycle.KapuaBirthMessage;
 import org.eclipse.kapua.message.device.lifecycle.KapuaDisconnectMessage;
@@ -31,40 +32,44 @@ public interface DeviceLifeCycleService extends KapuaService {
     /**
      * Processes a birth certificate for a device, creating or updating the device footprint with the information supplied.
      * 
+     * @param kapuaSession
      * @param connectionId
      * @param message
      * @throws KapuaException
      */
-    public <M extends KapuaBirthMessage> void birth(KapuaId connectionId, M message)
+    public <M extends KapuaBirthMessage> void birth(KapuaSession kapuaSession, KapuaId connectionId, M message)
             throws KapuaException;
 
     /**
      * Processes a death certificate for a device, updating the device footprint with the information supplied.
      * 
+     * @param kapuaSession
      * @param connectionId
      * @param message
      * @throws KapuaException
      */
-    public <M extends KapuaDisconnectMessage> void death(KapuaId connectionId, M message)
+    public <M extends KapuaDisconnectMessage> void death(KapuaSession kapuaSession, KapuaId connectionId, M message)
             throws KapuaException;
 
     /**
      * Processes a last-will testament for a device, updating the device footprint with the information supplied.
      * 
+     * @param kapuaSession
      * @param connectionId
      * @param message
      * @throws KapuaException
      */
-    public <M extends KapuaMissingMessage> void missing(KapuaId connectionId, M message)
+    public <M extends KapuaMissingMessage> void missing(KapuaSession kapuaSession, KapuaId connectionId, M message)
             throws KapuaException;
 
     /**
      * Processes a birth certificate for a device, creating or updating the device footprint with the information supplied.
      * 
+     * @param kapuaSession
      * @param connectionId
      * @param message
      * @throws KapuaException
      */
-    public <M extends KapuaAppsMessage> void applications(KapuaId connectionId, M message)
+    public <M extends KapuaAppsMessage> void applications(KapuaSession kapuaSession, KapuaId connectionId, M message)
             throws KapuaException;
 }

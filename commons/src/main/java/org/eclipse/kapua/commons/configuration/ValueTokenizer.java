@@ -217,7 +217,7 @@ public class ValueTokenizer {
                 case STRING:
                     minVal = ad.getMin() == null ? null : Integer.valueOf(ad.getMin());
                     maxVal = ad.getMax() == null ? null : Integer.valueOf(ad.getMax());
-                    if (minVal != null && s.length() < (Integer) maxVal) {
+                    if (minVal != null && s.length() < (Integer) minVal) {
                         rangeError = true;
                     } else if (maxVal != null && s.length() > (Integer) maxVal) {
                         rangeError = true;

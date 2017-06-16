@@ -33,9 +33,11 @@ Scenario: Birth message handling from a new device
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     And A birth message from device "device_1"
     When I search for the device "device_1" in account "AccountA"
     Then I find 1 device
@@ -64,9 +66,11 @@ Scenario: Birth message handling from an existing device
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     And A device such as
       | clientId | displayName | modelId         | serialNumber |
       | device_1 | testGateway | ReliaGate 10-20 | 12341234ABC  |
@@ -96,9 +100,11 @@ Scenario: Handling of 2 birth messages
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     And A birth message from device "device_1"
     And A birth message from device "device_1"
     When I search for events from device "device_1" in account "AccountA"
@@ -125,9 +131,11 @@ Scenario: Handling of a disconnect message from a non existing device
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     When A disconnect message from device "device_1"
     Then An exception was thrown
     And I logout
@@ -154,9 +162,11 @@ Scenario: Birth and death message handling
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     Given A birth message from device "device_1"
     And A disconnect message from device "device_1"
     When I search for events from device "device_1" in account "AccountA"
@@ -186,9 +196,11 @@ Scenario: Birth and missing event handling
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     Given A birth message from device "device_1"
     And A missing message from device "device_1"
     When I search for events from device "device_1" in account "AccountA"
@@ -218,9 +230,11 @@ Scenario: Birth and applications event handling
       | name    | displayName  | email             | phoneNumber     | status  | userType |
       | UserA   | Kapua User A | kapua_a@kapua.com | +386 31 323 444 | ENABLED | INTERNAL |
     And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
     Given A birth message from device "device_1"
     And An application message from device "device_1"
     When I search for events from device "device_1" in account "AccountA"

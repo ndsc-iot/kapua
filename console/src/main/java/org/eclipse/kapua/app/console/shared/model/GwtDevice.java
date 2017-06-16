@@ -48,14 +48,14 @@ public class GwtDevice extends GwtUpdatableEntityModel implements Serializable {
         }
     }
 
-    public enum GwtDeviceCredentialsTight implements IsSerializable {
+    public enum GwtDeviceUserCouplingMode implements IsSerializable {
         LOOSE("Unbound"), //
         STRICT("Device-bound"), //
         INHERITED("Account Default");
 
         private final String label;
 
-        GwtDeviceCredentialsTight(String label) {
+        GwtDeviceUserCouplingMode(String label) {
             this.label = label;
         }
 
@@ -63,10 +63,10 @@ public class GwtDevice extends GwtUpdatableEntityModel implements Serializable {
             return label;
         }
 
-        public static GwtDeviceCredentialsTight getEnumFromLabel(String label) {
-            GwtDeviceCredentialsTight gdct = null;
+        public static GwtDeviceUserCouplingMode getEnumFromLabel(String label) {
+            GwtDeviceUserCouplingMode gdct = null;
 
-            for (GwtDeviceCredentialsTight e : GwtDeviceCredentialsTight.values()) {
+            for (GwtDeviceUserCouplingMode e : GwtDeviceUserCouplingMode.values()) {
                 if (e.getLabel().equals(label)) {
                     gdct = e;
                 }
@@ -91,8 +91,8 @@ public class GwtDevice extends GwtUpdatableEntityModel implements Serializable {
             } else {
                 return null;
             }
-        } else if ("credentialsTightEnum".equals(property)) {
-            return (X) GwtDeviceCredentialsTight.valueOf(getCredentialsTight());
+        } else if ("deviceUserCouplingModeEnum".equals(property)) {
+            return (X) GwtDeviceUserCouplingMode.getEnumFromLabel(getDeviceUserCouplingMode());
         } else if ("deviceConnectionStatusEnum".equals(property)) {
             return (X) GwtDeviceConnectionStatus.valueOf(getGwtDeviceConnectionStatus());
         } else {
@@ -509,25 +509,29 @@ public class GwtDevice extends GwtUpdatableEntityModel implements Serializable {
         set("customAttribute5", customAttribute5);
     }
 
-    public String getCredentialsTight() {
-        return (String) get("credentialsTight");
+    public String getDeviceUserCouplingMode() {
+        return (String) get("deviceUserCouplingMode");
     }
 
-    public GwtDeviceCredentialsTight getCredentialTightEnum() {
-        return get("credentialsTightEnum");
+    public void setDeviceUserCouplingMode(String deviceUserCouplingMode) {
+        set("deviceUserCouplingMode", deviceUserCouplingMode);
     }
 
-    public void setCredentialsTight(String credentialsTight) {
-        set("credentialsTight", credentialsTight);
+    public void setReservedUserId(String reservedUserId) {
+        set("reservedUserId", reservedUserId);
     }
 
-    // public boolean getCredentialsAllowChange() {
-    // return get("credentialsAllowChange");
-    // }
-    //
-    // public void setCredentialsAllowChange(boolean credentialsAllowChange) {
-    // set("credentialsAllowChange", credentialsAllowChange);
-    // }
+    public String getReservedUserId() {
+        return get("reservedUserId");
+    }
+
+    public void setLastUserId(String lastUserId) {
+        set("lastUserId", lastUserId);
+    }
+
+    public String getLastUserId() {
+        return get("lastUserId");
+    }
 
     public boolean isOnline() {
         return "CONNECTED".equals(getGwtDeviceConnectionStatus());

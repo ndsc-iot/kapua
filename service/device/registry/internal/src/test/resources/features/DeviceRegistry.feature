@@ -18,9 +18,11 @@ Scenario: Create a single device
 	by the creation process.
 
 	When I configure
-		| type    | name                       | value | scopeId | parentScopeId |
-		| boolean | infiniteChildEntities      | true  |    1    |       1       |
-		| integer | maxNumberChildEntities     | 5     |    1    |       1       |
+		| type    | name                          | value | scopeId | parentScopeId |
+		| boolean | infiniteChildEntities         | true  |    1    |       1       |
+		| integer | maxNumberChildEntities        | 5     |    1    |       1       |
+		| boolean | deviceUserCouplingEnabled     | false |    1    |       1       |
+		| string  | deviceUserCouplingDefaultMode | LOOSE |    1    |       1       |
 	Given A device named "test_device"
 	Then The device has a non-null ID
 
@@ -98,19 +100,26 @@ Scenario: Count devices in a specific scope
 	counted, only the number of devices in the specified scope must be returned.
 
 	When I configure
-		| type    | name                       | value | scopeId | parentScopeId |
-		| boolean | infiniteChildEntities      | true  |    5    |       1       |
-		| integer | maxNumberChildEntities     | 50    |    5    |       1       |
+		| type    | name                          | value | scopeId | parentScopeId |
+		| boolean | infiniteChildEntities         | true  |    5    |       1       |
+		| integer | maxNumberChildEntities        | 50    |    5    |       1       |
+		| boolean | deviceUserCouplingEnabled     | false |    5    |       1       |
+		| string  | deviceUserCouplingDefaultMode | LOOSE |    5    |       1       |
 	Given I create 20 randomly named devices in scope 5
 	When I configure
-		| type    | name                       | value | scopeId | parentScopeId |
-		| boolean | infiniteChildEntities      | true  |    6    |       1       |
-		| integer | maxNumberChildEntities     | 5     |    6    |       1       |
+		| type    | name                          | value | scopeId | parentScopeId |
+		| boolean | infiniteChildEntities         | true  |    6    |       1       |
+		| integer | maxNumberChildEntities        | 5     |    6    |       1       |
+		| boolean | deviceUserCouplingEnabled     | false |    5    |       1       |
+		| string  | deviceUserCouplingDefaultMode | LOOSE |    5    |       1       |
+	And skipNextStep = false
 	Given I create 30 randomly named devices in scope 6
 	When I configure
-		| type    | name                       | value | scopeId | parentScopeId |
-		| boolean | infiniteChildEntities      | true  |    7    |       1       |
-		| integer | maxNumberChildEntities     | 5     |    7    |       1       |
+		| type    | name                          | value | scopeId | parentScopeId |
+		| boolean | infiniteChildEntities         | true  |    7    |       1       |
+		| integer | maxNumberChildEntities        | 5     |    7    |       1       |
+		| boolean | deviceUserCouplingEnabled     | false |    7    |       1       |
+		| string  | deviceUserCouplingDefaultMode | LOOSE |    7    |       1       |
 	Given I create 45 randomly named devices in scope 7
 	When I count the devices in scope 6
 	Then There are 30 devices

@@ -13,8 +13,8 @@ package org.eclipse.kapua.service.device.registry.internal;
 
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsEqualTo;
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsNotEqualTo;
-import static org.eclipse.kapua.service.device.registry.DeviceCredentialsMode.LOOSE;
-import static org.eclipse.kapua.service.device.registry.DeviceCredentialsMode.STRICT;
+import static org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode.LOOSE;
+import static org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode.STRICT;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -265,6 +265,7 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
             deviceRegistryService.setConfigValues(scopeId,
                     parentScopeId, valueMap);
         } catch (KapuaException ex) {
+            ex.printStackTrace();
             exceptionCaught = true;
         }
     }
@@ -361,7 +362,7 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
             throws KapuaException {
         device.setBiosVersion(device.getBiosVersion() + "_upd");
         device.setCustomAttribute1(device.getCustomAttribute1() + "_upd");
-        device.setCredentialsMode(STRICT);
+        device.setDeviceUserCouplingBound(STRICT);
         deviceRegistryService.update(device);
     }
 
@@ -468,8 +469,9 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
         assertEquals(deviceCreator.getCustomAttribute3(), device.getCustomAttribute3());
         assertEquals(deviceCreator.getCustomAttribute4(), device.getCustomAttribute4());
         assertEquals(deviceCreator.getCustomAttribute5(), device.getCustomAttribute5());
-        assertEquals(deviceCreator.getCredentialsMode(), device.getCredentialsMode());
-        assertEquals(deviceCreator.getPreferredUserId(), device.getPreferredUserId());
+        assertEquals(deviceCreator.getDeviceUserCouplingBound(), device.getDeviceUserCouplingBound());
+        assertEquals(deviceCreator.getLastUserId(), device.getLastUserId());
+        assertEquals(deviceCreator.getReservedUserId(), device.getReservedUserId());
         assertEquals(deviceCreator.getStatus(), device.getStatus());
     }
 
@@ -504,8 +506,9 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
         assertEquals(tmpDevice.getCustomAttribute3(), device.getCustomAttribute3());
         assertEquals(tmpDevice.getCustomAttribute4(), device.getCustomAttribute4());
         assertEquals(tmpDevice.getCustomAttribute5(), device.getCustomAttribute5());
-        assertEquals(tmpDevice.getCredentialsMode(), device.getCredentialsMode());
-        assertEquals(tmpDevice.getPreferredUserId(), device.getPreferredUserId());
+        assertEquals(tmpDevice.getDeviceUserCouplingBound(), device.getDeviceUserCouplingBound());
+        assertEquals(tmpDevice.getLastUserId(), device.getLastUserId());
+        assertEquals(tmpDevice.getReservedUserId(), device.getReservedUserId());
         assertEquals(tmpDevice.getStatus(), device.getStatus());
     }
 
@@ -600,8 +603,11 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
         tmpDeviceCreator.setCustomAttribute3("customAttribute3");
         tmpDeviceCreator.setCustomAttribute4("customAttribute4");
         tmpDeviceCreator.setCustomAttribute5("customAttribute5");
-        tmpDeviceCreator.setCredentialsMode(LOOSE);
-        tmpDeviceCreator.setPreferredUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
+
+        tmpDeviceCreator.setDeviceUserCouplingBound(LOOSE);
+        tmpDeviceCreator.setLastUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
+        tmpDeviceCreator.setReservedUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
+
         tmpDeviceCreator.setStatus(DeviceStatus.ENABLED);
 
         return tmpDeviceCreator;

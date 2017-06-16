@@ -15,7 +15,7 @@ import java.math.BigInteger;
 
 import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.model.id.KapuaId;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.DeviceStatus;
 
 /**
@@ -31,8 +31,8 @@ public class CucDevice {
     KapuaId kGroupId;
     Integer connectionId;
     KapuaId kConnectionId;
-    Integer preferredUserId;
-    KapuaId kPreferredUserId;
+    Integer reservedUserId;
+    KapuaId kReservedUserId;
     String clientId;
     String displayName;
     String status;
@@ -51,7 +51,7 @@ public class CucDevice {
     String applicationIdentifiers;
     String acceptEncoding;
     String credentialsMode;
-    DeviceCredentialsMode kCredentialsMode;
+    DeviceUserCouplingMode kCredentialsMode;
 
     public void parse() {
         if (scopeId != null) {
@@ -66,8 +66,8 @@ public class CucDevice {
             kConnectionId = new KapuaEid(BigInteger.valueOf(connectionId));
         }
 
-        if (preferredUserId != null) {
-            kPreferredUserId = new KapuaEid(BigInteger.valueOf(preferredUserId));
+        if (reservedUserId != null) {
+            kReservedUserId = new KapuaEid(BigInteger.valueOf(reservedUserId));
         }
 
         if (status != null) {
@@ -87,13 +87,13 @@ public class CucDevice {
         if (credentialsMode != null) {
             switch (credentialsMode.trim().toUpperCase()) {
             case "INHERITED":
-                kCredentialsMode = DeviceCredentialsMode.INHERITED;
+                kCredentialsMode = DeviceUserCouplingMode.INHERITED;
                 break;
             case "LOOSE":
-                kCredentialsMode = DeviceCredentialsMode.LOOSE;
+                kCredentialsMode = DeviceUserCouplingMode.LOOSE;
                 break;
             case "STRICT":
-                kCredentialsMode = DeviceCredentialsMode.STRICT;
+                kCredentialsMode = DeviceUserCouplingMode.STRICT;
                 break;
             default:
                 kCredentialsMode = null;
@@ -134,12 +134,12 @@ public class CucDevice {
         kConnectionId = connectionId;
     }
 
-    public KapuaId getPreferredUserId() {
-        return kPreferredUserId;
+    public KapuaId getReservedUserId() {
+        return kReservedUserId;
     }
 
-    public void setPreferredUserId(KapuaId preferredUserId) {
-        kPreferredUserId = preferredUserId;
+    public void setReservedUserId(KapuaId reservedUserId) {
+        kReservedUserId = reservedUserId;
     }
 
     public String getDisplayName() {
@@ -262,11 +262,11 @@ public class CucDevice {
         this.acceptEncoding = acceptEncoding;
     }
 
-    public DeviceCredentialsMode getCredentialsMode() {
+    public DeviceUserCouplingMode getDeviceUserCouplingBound() {
         return kCredentialsMode;
     }
 
-    public void setCredentialsMode(DeviceCredentialsMode credentialsMode) {
+    public void setDeviceUserCouplingBound(DeviceUserCouplingMode credentialsMode) {
         kCredentialsMode = credentialsMode;
     }
 }

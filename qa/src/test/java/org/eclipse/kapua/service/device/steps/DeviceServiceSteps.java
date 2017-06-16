@@ -64,7 +64,7 @@ import org.eclipse.kapua.service.account.Account;
 import org.eclipse.kapua.service.account.AccountService;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
@@ -171,7 +171,7 @@ public class DeviceServiceSteps extends KapuaTest {
             tmpMsg.setDeviceId(null);
         }
 
-        deviceLifeCycleService.birth(generateRandomId(), tmpMsg);
+        deviceLifeCycleService.birth(KapuaSecurityUtils.getSession(), generateRandomId(), tmpMsg);
     }
 
     @Given("^A disconnect message from device \"(.+)\"$")
@@ -207,7 +207,7 @@ public class DeviceServiceSteps extends KapuaTest {
 
         try {
             stepData.put("ExceptionCaught", false);
-            deviceLifeCycleService.death(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.death(KapuaSecurityUtils.getSession(), generateRandomId(), tmpMsg);
         } catch (KapuaException ex) {
             stepData.put("ExceptionCaught", true);
         }
@@ -245,7 +245,7 @@ public class DeviceServiceSteps extends KapuaTest {
 
         try {
             stepData.put("ExceptionCaught", false);
-            deviceLifeCycleService.missing(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.missing(KapuaSecurityUtils.getSession(), generateRandomId(), tmpMsg);
         } catch (KapuaException ex) {
             stepData.put("ExceptionCaught", true);
         }
@@ -283,7 +283,7 @@ public class DeviceServiceSteps extends KapuaTest {
 
         try {
             stepData.put("ExceptionCaught", false);
-            deviceLifeCycleService.applications(generateRandomId(), tmpMsg);
+            deviceLifeCycleService.applications(KapuaSecurityUtils.getSession(), generateRandomId(), tmpMsg);
         } catch (KapuaException ex) {
         }
     }
@@ -521,8 +521,8 @@ public class DeviceServiceSteps extends KapuaTest {
         if (dev.connectionId != null) {
             tmpCr.setConnectionId(dev.getConnectionId());
         }
-        if (dev.preferredUserId != null) {
-            tmpCr.setPreferredUserId(dev.getPreferredUserId());
+        if (dev.reservedUserId != null) {
+            tmpCr.setReservedUserId(dev.getReservedUserId());
         }
         if (dev.displayName != null) {
             tmpCr.setDisplayName(dev.displayName);
@@ -570,7 +570,7 @@ public class DeviceServiceSteps extends KapuaTest {
             tmpCr.setAcceptEncoding(dev.acceptEncoding);
         }
         if (dev.credentialsMode != null) {
-            tmpCr.setCredentialsMode(dev.getCredentialsMode());
+            tmpCr.setDeviceUserCouplingBound(dev.getDeviceUserCouplingBound());
         }
 
         return tmpCr;
@@ -603,8 +603,8 @@ public class DeviceServiceSteps extends KapuaTest {
         tmpCr.setCustomAttribute3("customAttribute3");
         tmpCr.setCustomAttribute4("customAttribute4");
         tmpCr.setCustomAttribute5("customAttribute5");
-        tmpCr.setCredentialsMode(DeviceCredentialsMode.LOOSE);
-        tmpCr.setPreferredUserId(generateRandomId());
+        tmpCr.setDeviceUserCouplingBound(DeviceUserCouplingMode.LOOSE);
+        tmpCr.setReservedUserId(generateRandomId());
         tmpCr.setStatus(DeviceStatus.ENABLED);
 
         return tmpCr;

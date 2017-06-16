@@ -60,8 +60,9 @@ import org.eclipse.kapua.service.device.registry.event.DeviceEvent;
         "customAttribute3",
         "customAttribute4",
         "customAttribute5",
-        "credentialsMode",
-        "preferredUserId"
+        "deviceUserCouplingBound",
+        "lastUserId",
+        "reservedUserId"
         // // derived attributes
         // "uptime",
         // "modelName",
@@ -464,39 +465,57 @@ public interface Device extends KapuaUpdatableEntity {
     public void setCustomAttribute5(String customAttribute5);
 
     /**
-     * Get credentials mode.<br>
-     * The device credential mode sets a security level for the devices, setting a specific user connection policy between the available policies.
+     * Get the device-user coupling mode.<br>
+     * The device user coupling bound sets a security level for the devices, setting a specific user connection policy between the available policies.
      * 
      * @return
      */
-    @XmlElement(name = "deviceCredentialsMode")
-    public DeviceCredentialsMode getCredentialsMode();
+    @XmlElement(name = "deviceUserCouplingBound")
+    public DeviceUserCouplingMode getDeviceUserCouplingBound();
 
     /**
-     * Set credentials mode.<br>
-     * The device credential mode sets a security level for the devices, setting a specific user connection policy between the available policies.
+     * Set the device-user coupling mode.<br>
+     * The device user coupling bound sets a security level for the devices, setting a specific user connection policy between the available policies.
      * 
-     * @param credentialsMode
+     * @param deviceUserCouplingMode
      */
-    public void setCredentialsMode(DeviceCredentialsMode credentialsMode);
+    public void setDeviceUserCouplingBound(DeviceUserCouplingMode deviceUserCouplingMode);
 
     /**
-     * Get preferred user identifier.<br>
-     * Set the preferred user identifier that can connect to this device.
+     * Get the last user identifier.<br>
+     * Set the last user identifier used to connect this device.
      * 
      * @return
      */
-    @XmlElement(name = "preferredUserId")
+    @XmlElement(name = "lastUserId")
     @XmlJavaTypeAdapter(KapuaIdAdapter.class)
-    public KapuaId getPreferredUserId();
+    public KapuaId getLastUserId();
 
     /**
-     * Set preferred user identifier.<br>
-     * Set the preferred user identifier that can connect to this device.
+     * Set the last user identifier.<br>
+     * Set the last user identifier used to connect this device.
      * 
-     * @param deviceUserId
+     * @param lastUserId
      */
-    public void setPreferredUserId(KapuaId deviceUserId);
+    public void setLastUserId(KapuaId lastUserId);
+
+    /**
+     * Get reserved user identifier.<br>
+     * Set the reserved user identifier that can connect to this device.
+     * 
+     * @return
+     */
+    @XmlElement(name = "reservedUserId")
+    @XmlJavaTypeAdapter(KapuaIdAdapter.class)
+    public KapuaId getReservedUserId();
+
+    /**
+     * Set reserved user identifier.<br>
+     * Set the reserved user identifier that can connect to this device.
+     * 
+     * @param reservedUserId
+     */
+    public void setReservedUserId(KapuaId reservedUserId);
 
     /*
      * // --------------------------

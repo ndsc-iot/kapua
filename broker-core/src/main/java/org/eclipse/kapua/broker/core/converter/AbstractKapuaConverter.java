@@ -32,6 +32,7 @@ import org.eclipse.kapua.broker.core.plugin.ConnectorDescriptor;
 import org.eclipse.kapua.broker.core.plugin.ConnectorDescriptor.MessageType;
 import org.eclipse.kapua.commons.metric.MetricServiceFactory;
 import org.eclipse.kapua.commons.metric.MetricsService;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,9 @@ public abstract class AbstractKapuaConverter {
                 String clientId = message.getHeader(MessageConstants.HEADER_KAPUA_CLIENT_ID, String.class);
                 ConnectorDescriptor connectorDescriptor = (ConnectorDescriptor) SerializationUtils
                         .deserialize(message.getHeader(MessageConstants.HEADER_KAPUA_CONNECTOR_DEVICE_PROTOCOL, byte[].class));
-                return JmsUtil.convertToCamelKapuaMessage(connectorDescriptor, messageType, (byte[]) value, CamelUtil.getTopic(message), queuedOn, connectionId, clientId);
+                KapuaSession kapuaSession = (KapuaSession) SerializationUtils
+                        .deserialize(message.getHeader(MessageConstants.HEADER_KAPUA_SESSION, byte[].class));
+                return JmsUtil.convertToCamelKapuaMessage(kapuaSession, connectorDescriptor, messageType, (byte[]) value, CamelUtil.getTopic(message), queuedOn, connectionId, clientId);
             } catch (JMSException e) {
                 metricConverterErrorMessage.inc();
                 logger.error("Exception converting message {}", e.getMessage(), e);

@@ -69,7 +69,7 @@ public class DeviceMessageListener extends AbstractListener {
      */
     public void processBirthMessage(CamelKapuaMessage<KapuaBirthMessage> birthMessage) {
         try {
-            deviceLifeCycleService.birth(birthMessage.getConnectionId(), birthMessage.getMessage());
+            deviceLifeCycleService.birth(birthMessage.getKapuaSession(), birthMessage.getConnectionId(), birthMessage.getMessage());
             metricDeviceBirthMessage.inc();
             // //republish BA
             // Date now = new Date();
@@ -111,7 +111,7 @@ public class DeviceMessageListener extends AbstractListener {
      */
     public void processDisconnectMessage(CamelKapuaMessage<KapuaDisconnectMessage> disconnectMessage) {
         try {
-            deviceLifeCycleService.death(disconnectMessage.getConnectionId(), disconnectMessage.getMessage());
+            deviceLifeCycleService.death(disconnectMessage.getKapuaSession(), disconnectMessage.getConnectionId(), disconnectMessage.getMessage());
             metricDeviceDisconnectMessage.inc();
         } catch (KapuaException e) {
             metricDeviceErrorMessage.inc();
@@ -127,7 +127,7 @@ public class DeviceMessageListener extends AbstractListener {
      */
     public void processAppsMessage(CamelKapuaMessage<KapuaAppsMessage> appsMessage) {
         try {
-            deviceLifeCycleService.applications(appsMessage.getConnectionId(), appsMessage.getMessage());
+            deviceLifeCycleService.applications(appsMessage.getKapuaSession(), appsMessage.getConnectionId(), appsMessage.getMessage());
             metricDeviceAppsMessage.inc();
         } catch (KapuaException e) {
             metricDeviceErrorMessage.inc();
@@ -143,7 +143,7 @@ public class DeviceMessageListener extends AbstractListener {
      */
     public void processMissingMessage(CamelKapuaMessage<KapuaMissingMessage> missingMessage) {
         try {
-            deviceLifeCycleService.missing(missingMessage.getConnectionId(), missingMessage.getMessage());
+            deviceLifeCycleService.missing(missingMessage.getKapuaSession(), missingMessage.getConnectionId(), missingMessage.getMessage());
             metricDeviceMissingMessage.inc();
         } catch (KapuaException e) {
             metricDeviceErrorMessage.inc();

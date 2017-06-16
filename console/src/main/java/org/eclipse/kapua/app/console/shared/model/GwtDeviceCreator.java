@@ -13,7 +13,7 @@ package org.eclipse.kapua.app.console.shared.model;
 
 import java.io.Serializable;
 
-import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceCredentialsTight;
+import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceUserCouplingMode;
 
 public class GwtDeviceCreator extends KapuaBaseModel implements Serializable {
 
@@ -26,8 +26,8 @@ public class GwtDeviceCreator extends KapuaBaseModel implements Serializable {
     private String displayName;
 
     // Security options
-    private GwtDeviceCredentialsTight gwtCredentialsTight;
-    private String gwtPreferredUserId;
+    private GwtDeviceUserCouplingMode deviceUserCouplingMode;
+    private String reservedUserId;
 
     // Custom Attributes
     private String customAttribute1;
@@ -71,24 +71,20 @@ public class GwtDeviceCreator extends KapuaBaseModel implements Serializable {
         this.displayName = displayName;
     }
 
-    public GwtDeviceCredentialsTight getGwtCredentialsTight() {
-        return gwtCredentialsTight;
+    public GwtDeviceUserCouplingMode getDeviceUserCouplingMode() {
+        return deviceUserCouplingMode;
     }
 
-    public void setGwtCredentialsTight(String gwtCredentialsTight) {
-        setGwtCredentialsTight(GwtDeviceCredentialsTight.getEnumFromLabel(gwtCredentialsTight));
+    public void setDeviceUserCouplingMode(GwtDeviceUserCouplingMode deviceUserCouplingMode) {
+        this.deviceUserCouplingMode = deviceUserCouplingMode;
     }
 
-    public void setGwtCredentialsTight(GwtDeviceCredentialsTight gwtCredentialsTight) {
-        this.gwtCredentialsTight = gwtCredentialsTight;
+    public String getReservedUserId() {
+        return reservedUserId;
     }
 
-    public String getGwtPreferredUserId() {
-        return gwtPreferredUserId;
-    }
-
-    public void setGwtPreferredUserId(String gwtPreferredUserId) {
-        this.gwtPreferredUserId = gwtPreferredUserId;
+    public void setReservedUserId(String reservedUserId) {
+        this.reservedUserId = reservedUserId;
     }
 
     public String getCustomAttribute1() {

@@ -24,6 +24,7 @@ import org.eclipse.kapua.broker.core.converter.AbstractKapuaConverter;
 import org.eclipse.kapua.broker.core.plugin.AclConstants;
 import org.eclipse.kapua.broker.core.plugin.ConnectorDescriptor;
 import org.eclipse.kapua.broker.core.plugin.ConnectorDescriptor.MessageType;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.message.KapuaMessage;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.device.call.message.DeviceMessage;
@@ -68,16 +69,18 @@ public class JmsUtil {
     /**
      * Convert a {@link BytesMessage} to {@link CamelKapuaMessage}
      *
+     * @param kapuaSession
      * @param jmsMessage
      * @throws JMSException
      * @throws KapuaException
      */
-    public static CamelKapuaMessage<?> convertToKapuaMessage(ConnectorDescriptor connectorDescriptor, MessageType messageType, BytesMessage jmsMessage, KapuaId connectionId, String clientId)
+    public static CamelKapuaMessage<?> convertToKapuaMessage(KapuaSession kapuaSession, ConnectorDescriptor connectorDescriptor, MessageType messageType, BytesMessage jmsMessage, KapuaId connectionId,
+            String clientId)
             throws JMSException, KapuaException {
         String jmsTopic = jmsMessage.getStringProperty(MessageConstants.PROPERTY_ORIGINAL_TOPIC);
         Date queuedOn = new Date(jmsMessage.getLongProperty(MessageConstants.PROPERTY_ENQUEUED_TIMESTAMP));
-        return convertToKapuaMessage(connectorDescriptor, connectorDescriptor.getDeviceClass(messageType), connectorDescriptor.getKapuaClass(messageType), jmsMessage, jmsTopic, queuedOn, connectionId,
-                clientId);
+        return convertToKapuaMessage(kapuaSession, connectorDescriptor, connectorDescriptor.getDeviceClass(messageType), connectorDescriptor.getKapuaClass(messageType), jmsMessage, jmsTopic, queuedOn,
+                connectionId, clientId);
     }
 
     /**
@@ -85,6 +88,7 @@ public class JmsUtil {
      * <p>
      * this code
      * <p>
+     * 
      * <pre>
      * <code>
      * if (jmsMessage.getBodyLength() > 0) {
@@ -100,6 +104,7 @@ public class JmsUtil {
      * ((ActiveMQMessage)jmsMessage).getContent().data<br>
      * so we modify the method assuming that camel converter called this utility method with a byte[] representing the jms body message.
      *
+     * @param kapuaSession
      * @param jmsMessage
      * @throws JMSException
      * @throws KapuaException
@@ -107,9 +112,8 @@ public class JmsUtil {
      */
 
     // TODO check the code with huge messages
-    private static CamelKapuaMessage<?> convertToKapuaMessage(ConnectorDescriptor connectorDescriptor, Class<? extends DeviceMessage<?, ?>> deviceMessageType,
-            Class<? extends KapuaMessage<?, ?>> kapuaMessageType, BytesMessage jmsMessage, String jmsTopic,
-            Date queuedOn, KapuaId connectionId, String clientId)
+    private static CamelKapuaMessage<?> convertToKapuaMessage(KapuaSession kapuaSession, ConnectorDescriptor connectorDescriptor, Class<? extends DeviceMessage<?, ?>> deviceMessageType,
+            Class<? extends KapuaMessage<?, ?>> kapuaMessageType, BytesMessage jmsMessage, String jmsTopic, Date queuedOn, KapuaId connectionId, String clientId)
             throws JMSException, KapuaException {
         byte[] payload = null;
         // TODO JMS message have no size limits!
@@ -119,12 +123,13 @@ public class JmsUtil {
             logger.debug("Message conversion... {} bytes read!", readBytes);
         }
         KapuaMessage<?, ?> kapuaMessage = convertToKapuaMessage(deviceMessageType, kapuaMessageType, payload, jmsTopic, queuedOn, connectionId, clientId);
-        return new CamelKapuaMessage<>(kapuaMessage, connectionId, connectorDescriptor);
+        return new CamelKapuaMessage<>(kapuaSession, kapuaMessage, connectionId, connectorDescriptor);
     }
 
     /**
      * Convert raw byte[] message to {@link CamelKapuaMessage}
      *
+     * @param kapuaSession
      * @param connectorDescriptor
      * @param messageType
      * @param messageBody
@@ -134,12 +139,13 @@ public class JmsUtil {
      * @return
      * @throws KapuaException
      */
-    public static CamelKapuaMessage<?> convertToCamelKapuaMessage(ConnectorDescriptor connectorDescriptor, MessageType messageType, byte[] messageBody, String jmsTopic, Date queuedOn,
+    public static CamelKapuaMessage<?> convertToCamelKapuaMessage(KapuaSession kapuaSession, ConnectorDescriptor connectorDescriptor, MessageType messageType, byte[] messageBody, String jmsTopic,
+            Date queuedOn,
             KapuaId connectionId, String clientId)
             throws KapuaException {
         KapuaMessage<?, ?> kapuaMessage = convertToKapuaMessage(connectorDescriptor.getDeviceClass(messageType), connectorDescriptor.getKapuaClass(messageType), messageBody, jmsTopic, queuedOn,
                 connectionId, clientId);
-        return new CamelKapuaMessage<KapuaMessage<?, ?>>(kapuaMessage, connectionId, connectorDescriptor);
+        return new CamelKapuaMessage<KapuaMessage<?, ?>>(kapuaSession, kapuaMessage, connectionId, connectorDescriptor);
     }
 
     /**

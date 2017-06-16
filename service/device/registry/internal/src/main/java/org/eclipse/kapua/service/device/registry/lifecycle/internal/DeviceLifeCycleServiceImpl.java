@@ -11,7 +11,10 @@
  *******************************************************************************/
 package org.eclipse.kapua.service.device.registry.lifecycle.internal;
 
+import static org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode.LOOSE;
+
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.locator.KapuaLocator;
 import org.eclipse.kapua.locator.KapuaProvider;
 import org.eclipse.kapua.message.KapuaPayload;
@@ -26,7 +29,6 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.device.management.response.KapuaResponseCode;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventCreator;
@@ -43,7 +45,7 @@ import org.eclipse.kapua.service.device.registry.lifecycle.DeviceLifeCycleServic
 public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
 
     @Override
-    public void birth(KapuaId connectionId, KapuaBirthMessage message)
+    public void birth(KapuaSession kapuaSession, KapuaId connectionId, KapuaBirthMessage message)
             throws KapuaException {
         KapuaBirthPayload payload = message.getPayload();
         KapuaBirthChannel channel = message.getChannel();
@@ -75,7 +77,8 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
             deviceCreator.setApplicationFrameworkVersion(payload.getApplicationFrameworkVersion());
             deviceCreator.setApplicationIdentifiers(payload.getApplicationIdentifiers());
             deviceCreator.setAcceptEncoding(payload.getAcceptEncoding());
-            deviceCreator.setCredentialsMode(DeviceCredentialsMode.LOOSE);
+            deviceCreator.setDeviceUserCouplingBound(LOOSE);
+            deviceCreator.setLastUserId(kapuaSession.getUserId());
 
             // issue #57
             deviceCreator.setConnectionId(connectionId);
@@ -97,6 +100,7 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
             device.setApplicationFrameworkVersion(payload.getApplicationFrameworkVersion());
             device.setApplicationIdentifiers(payload.getApplicationIdentifiers());
             device.setAcceptEncoding(payload.getAcceptEncoding());
+            device.setLastUserId(kapuaSession.getUserId());
 
             // issue #57
             device.setConnectionId(connectionId);
@@ -124,7 +128,7 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
     }
 
     @Override
-    public void death(KapuaId connectionId, KapuaDisconnectMessage message)
+    public void death(KapuaSession kapuaSession, KapuaId connectionId, KapuaDisconnectMessage message)
             throws KapuaException {
         KapuaId scopeId = message.getScopeId();
         KapuaId deviceId = message.getDeviceId();
@@ -153,7 +157,7 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
     }
 
     @Override
-    public void missing(KapuaId connectionId, KapuaMissingMessage message)
+    public void missing(KapuaSession kapuaSession, KapuaId connectionId, KapuaMissingMessage message)
             throws KapuaException {
         KapuaPayload payload = message.getPayload();
         KapuaId scopeId = message.getScopeId();
@@ -186,7 +190,7 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
     }
 
     @Override
-    public void applications(KapuaId connectionId, KapuaAppsMessage message)
+    public void applications(KapuaSession kapuaSession, KapuaId connectionId, KapuaAppsMessage message)
             throws KapuaException {
         KapuaPayload payload = message.getPayload();
         KapuaId scopeId = message.getScopeId();

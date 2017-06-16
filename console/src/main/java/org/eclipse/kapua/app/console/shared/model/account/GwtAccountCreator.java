@@ -13,7 +13,7 @@ package org.eclipse.kapua.app.console.shared.model.account;
 
 import java.util.Date;
 
-import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceCredentialsTight;
+import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceUserCouplingMode;
 import org.eclipse.kapua.app.console.shared.model.GwtEntityCreator;
 
 public class GwtAccountCreator extends GwtEntityCreator {
@@ -48,7 +48,7 @@ public class GwtAccountCreator extends GwtEntityCreator {
 
     // Tight Coupling
     private boolean deviceNewAllowUnprovisioned;
-    private GwtDeviceCredentialsTight deviceDefaultCredentialsTight;
+    private GwtDeviceUserCouplingMode defaultDeviceUserCouplingMode;
 
     // Service plan
     private int maxNumberOfDevices;
@@ -394,15 +394,15 @@ public class GwtAccountCreator extends GwtEntityCreator {
         this.deviceNewAllowUnprovisioned = deviceNewAllowUnprovisioned;
     }
 
-    public GwtDeviceCredentialsTight getDeviceDefaultCredentialsTight() {
-        return deviceDefaultCredentialsTight;
+    public GwtDeviceUserCouplingMode getDeviceDefaultCredentialsTight() {
+        return defaultDeviceUserCouplingMode;
     }
 
-    public void setDeviceDefaultCredentialsTight(String deviceDefaultCredentialsTight) {
-        setDeviceDefaultCredentialsTight(GwtDeviceCredentialsTight.getEnumFromLabel(deviceDefaultCredentialsTight));
+    public void setDefaultDeviceUserCouplingMode(String deviceDefaultCredentialsTight) {
+        setDefaultDeviceUserCouplingMode(GwtDeviceUserCouplingMode.getEnumFromLabel(deviceDefaultCredentialsTight));
     }
 
-    public void setDeviceDefaultCredentialsTight(GwtDeviceCredentialsTight deviceDefaultCredentialsTight) {
-        this.deviceDefaultCredentialsTight = deviceDefaultCredentialsTight;
+    public void setDefaultDeviceUserCouplingMode(GwtDeviceUserCouplingMode defaultDeviceUserCouplingMode) {
+        this.defaultDeviceUserCouplingMode = defaultDeviceUserCouplingMode;
     }
 }

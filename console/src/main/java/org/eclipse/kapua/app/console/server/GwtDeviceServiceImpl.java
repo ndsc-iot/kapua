@@ -20,7 +20,7 @@ import org.eclipse.kapua.app.console.setting.ConsoleSetting;
 import org.eclipse.kapua.app.console.setting.ConsoleSettingKeys;
 import org.eclipse.kapua.app.console.shared.GwtKapuaException;
 import org.eclipse.kapua.app.console.shared.model.GwtDevice;
-import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceCredentialsTight;
+import org.eclipse.kapua.app.console.shared.model.GwtDevice.GwtDeviceUserCouplingMode;
 import org.eclipse.kapua.app.console.shared.model.GwtDeviceCreator;
 import org.eclipse.kapua.app.console.shared.model.GwtDeviceEvent;
 import org.eclipse.kapua.app.console.shared.model.GwtDeviceQueryPredicates;
@@ -43,7 +43,7 @@ import org.eclipse.kapua.model.query.predicate.KapuaAndPredicate;
 import org.eclipse.kapua.model.query.predicate.KapuaAttributePredicate.Operator;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DevicePredicates;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
@@ -151,8 +151,8 @@ public class GwtDeviceServiceImpl extends KapuaConfigurableRemoteServiceServlet<
                     }
                 }
 
-                if (device.getPreferredUserId() != null) {
-                    pairs.add(new GwtGroupedNVPair("devInfo", "devLastUserUsed", device.getPreferredUserId().toCompactId()));
+                if (device.getLastUserId() != null) {
+                    pairs.add(new GwtGroupedNVPair("devInfo", "devLastUserUsed", device.getLastUserId().toCompactId()));
                 }
 
                 pairs.add(new GwtGroupedNVPair("devInfo", "devApps", device.getApplicationIdentifiers()));
@@ -165,8 +165,16 @@ public class GwtDeviceServiceImpl extends KapuaConfigurableRemoteServiceServlet<
                 pairs.add(new GwtGroupedNVPair("devAttributesInfo", "devCustomAttribute5", device.getCustomAttribute5()));
 
                 // Credentials tight
-                pairs.add(new GwtGroupedNVPair("devSecurity", "devSecurityCredentialsTight", GwtDeviceCredentialsTight.valueOf(device.getCredentialsMode().name()).getLabel()));
-                pairs.add(new GwtGroupedNVPair("devSecurity", "devSecurityAllowCredentialsChange", device.getPreferredUserId() == null));
+                String deviceUserCouplingBound = "N/A";
+                if (device.getDeviceUserCouplingBound() != null) {
+                    GwtDeviceUserCouplingMode gwtDeviceUserCouplingMode = GwtDeviceUserCouplingMode.valueOf(device.getDeviceUserCouplingBound().name());
+                    if (gwtDeviceUserCouplingMode != null) {
+                        deviceUserCouplingBound = gwtDeviceUserCouplingMode.getLabel();
+                    }
+                }
+                pairs.add(new GwtGroupedNVPair("devSecurity", "devSecurityDeviceUserCouplingMode", deviceUserCouplingBound));
+                pairs.add(new GwtGroupedNVPair("devSecurity", "devSecurityReservedUser", KapuaGwtModelConverter.convert(device.getReservedUserId())));
+                pairs.add(new GwtGroupedNVPair("devSecurity", "devSecurityLastUser", KapuaGwtModelConverter.convert(device.getLastUserId())));
 
                 pairs.add(new GwtGroupedNVPair("devHw", "devModelName", device.getModelId()));
                 pairs.add(new GwtGroupedNVPair("devHw", "devModelId", device.getModelId()));
@@ -343,7 +351,7 @@ public class GwtDeviceServiceImpl extends KapuaConfigurableRemoteServiceServlet<
             deviceCreator.setGroupId(GwtKapuaModelConverter.convert(gwtDeviceCreator.getGroupId()));
 
             // FIXME One day it will be specified from the form. In the meantime, defaults to LOOSE
-            deviceCreator.setCredentialsMode(DeviceCredentialsMode.LOOSE);
+            deviceCreator.setDeviceUserCouplingBound(DeviceUserCouplingMode.LOOSE);
 
             deviceCreator.setCustomAttribute1(gwtDeviceCreator.getCustomAttribute1());
             deviceCreator.setCustomAttribute2(gwtDeviceCreator.getCustomAttribute2());
@@ -387,9 +395,10 @@ public class GwtDeviceServiceImpl extends KapuaConfigurableRemoteServiceServlet<
             device.setGroupId(GwtKapuaModelConverter.convert(gwtDevice.getGroupId()));
 
             // Security Stuff
-            // device.setCredentialsMode(DeviceCredentialsMode.valueOf(gwtDevice.getCredentialsTight()));
-            // KapuaId deviceUserId = KapuaEid.parseCompactId(gwtDevice.getDeviceUserId());
-            // device.setPreferredUserId(deviceUserId);
+            GwtDeviceUserCouplingMode gwtDeviceUserCouplingMode = GwtDeviceUserCouplingMode.getEnumFromLabel(gwtDevice.getDeviceUserCouplingMode());
+            device.setDeviceUserCouplingBound(gwtDeviceUserCouplingMode.name() != null ? DeviceUserCouplingMode.valueOf(gwtDeviceUserCouplingMode.name()) : null);
+            device.setReservedUserId(GwtKapuaModelConverter.convert(gwtDevice.getReservedUserId()));
+            device.setLastUserId(GwtKapuaModelConverter.convert(gwtDevice.getLastUserId()));
 
             // Custom attributes
             device.setCustomAttribute1(gwtDevice.getUnescapedCustomAttribute1());
@@ -399,6 +408,7 @@ public class GwtDeviceServiceImpl extends KapuaConfigurableRemoteServiceServlet<
             device.setCustomAttribute5(gwtDevice.getUnescapedCustomAttribute5());
 
             device.setOptlock(gwtDevice.getOptlock());
+
 
             // Do the update
             device = deviceRegistryService.update(device);
