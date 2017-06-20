@@ -16,8 +16,8 @@
 
 ALTER TABLE dvc_device ALTER COLUMN preferred_user_id RENAME TO last_user_id;
 ALTER TABLE dvc_device ALTER COLUMN credentials_mode RENAME TO device_user_coupling_mode;
-ALTER TABLE dvc_device ADD reserved_user_id BIGINT(21) DEFAULT NULL UNIQUE;
+ALTER TABLE dvc_device ADD reserved_user_id BIGINT(21) DEFAULT NULL;
 
 CREATE INDEX idx_device_last_user_id ON dvc_device (scope_id, last_user_id);
-CREATE INDEX idx_device_reserved_user_id ON dvc_device (scope_id, reserved_user_id);
+CREATE UNIQUE INDEX idx_device_reserved_user_id ON dvc_device (scope_id, reserved_user_id);
 DROP INDEX idx_device_preferred_user_id;

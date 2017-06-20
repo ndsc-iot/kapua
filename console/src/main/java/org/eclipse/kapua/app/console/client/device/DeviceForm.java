@@ -207,7 +207,7 @@ public class DeviceForm extends Window {
 
             @Override
             public void onFailure(Throwable caught) {
-                FailureHandler.handle(caught);                
+                FailureHandler.handle(caught);
             }
 
             @Override
@@ -282,8 +282,10 @@ public class DeviceForm extends Window {
             public void onSuccess(ListLoadResult<GwtUser> result) {
                 reservedUserCombo.getStore().removeAll();
                 reservedUserCombo.getStore().add(NO_USER);
-                reservedUserCombo.getStore().add(result.getData());
-                
+                for (GwtUser gwtUser : result.getData()) {
+                    reservedUserCombo.getStore().add(gwtUser);
+                }
+                setReservedUser();
             }
 
         });
@@ -542,22 +544,6 @@ public class DeviceForm extends Window {
                 gwtDeviceUserCouplingMode = GwtDeviceUserCouplingMode.getEnumFromLabel(selectedDevice.getDeviceUserCouplingMode());
             }
             deviceUserCouplingMode.setSimpleValue(gwtDeviceUserCouplingMode != null ? gwtDeviceUserCouplingMode.getLabel() : "N/A");
-            if (selectedDevice.getReservedUserId() != null) {
-                gwtUserService.find(currentSession.getSelectedAccount().getId(), selectedDevice.getReservedUserId(), new AsyncCallback<GwtUser>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        FailureHandler.handle(caught);
-                    }
-
-                    @Override
-                    public void onSuccess(GwtUser gwtUser) {
-                        reservedUserCombo.setValue(gwtUser);
-                    }
-                });
-            } else {
-                reservedUserCombo.setValue(NO_USER);
-            }
             if (selectedDevice.getLastUserId() != null) {
                 gwtUserService.find(currentSession.getSelectedAccount().getId(), selectedDevice.getLastUserId(), new AsyncCallback<GwtUser>() {
                     
@@ -604,6 +590,18 @@ public class DeviceForm extends Window {
 
             // Other data
             optlock.setValue(selectedDevice.getOptlock());
+        }
+    }
+
+    private void setReservedUser() {
+        for (GwtUser gwtUser : reservedUserCombo.getStore().getModels()) {
+            if (gwtUser.getId() == null) {
+                if (selectedDevice.getReservedUserId() == null) {
+                    reservedUserCombo.setValue(gwtUser);
+                }
+            } else if (gwtUser.getId().equals(selectedDevice.getReservedUserId())) {
+                reservedUserCombo.setValue(gwtUser);
+            }
         }
     }
 

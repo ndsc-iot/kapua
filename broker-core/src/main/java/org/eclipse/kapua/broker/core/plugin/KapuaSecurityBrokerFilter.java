@@ -72,6 +72,9 @@ import org.eclipse.kapua.service.authorization.permission.Actions;
 import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.datastore.DatastoreDomain;
 import org.eclipse.kapua.service.device.management.commons.DeviceManagementDomain;
+import org.eclipse.kapua.service.device.registry.Device;
+import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
+import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionCreator;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnectionFactory;
@@ -150,6 +153,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
     private AccountService accountService = KapuaLocator.getInstance().getService(AccountService.class);
     private DeviceConnectionService deviceConnectionService = KapuaLocator.getInstance().getService(DeviceConnectionService.class);
     private DeviceConnectionFactory deviceConnectionFactory = KapuaLocator.getInstance().getFactory(DeviceConnectionFactory.class);
+    private DeviceRegistryService deviceRegistryService = KapuaLocator.getInstance().getService(DeviceRegistryService.class);
     private MetricsService metricsService = MetricServiceFactory.getInstance();
 
     public KapuaSecurityBrokerFilter(Broker next) throws KapuaException {
@@ -375,6 +379,34 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
                     throw new KapuaIllegalAccessException(permissionFactory.newPermission(BROKER_DOMAIN, Actions.connect, scopeId).toString());
                 }
                 loginCheckAccessTimeContext.stop();
+
+                // enforce the user-device bound
+                Device device = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.findByClientId(scopeId, clientId));
+                if (device != null) {
+                    DeviceUserCouplingMode deviceUserCouplingMode = device.getDeviceUserCouplingBound();
+                    if (DeviceUserCouplingMode.INHERITED.equals(device.getDeviceUserCouplingBound())) {
+                        Map<String, Object> options = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.getConfigValues(scopeId));
+                        String tmp = (String) options.get("deviceUserCouplingDefaultMode");// TODO move to constants
+                        if (tmp != null) {
+                            DeviceUserCouplingMode tmpDeviceUserCouplingMode = DeviceUserCouplingMode.valueOf(tmp);
+                            if (tmpDeviceUserCouplingMode != null) {
+                                logger.warn("Cannot parse the default Device-User coupling mode in the registry service configuration! (found '{}' - allowed values are 'LOOSE' - 'STRICT')", tmp);
+                            } else {
+                                deviceUserCouplingMode = tmpDeviceUserCouplingMode;
+                            }
+                        } else {
+                            logger.warn("Cannot find default Device-User coupling mode in the registry service configuration! (deviceUserCouplingDefaultMode)");
+                        }
+                    }
+                    if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode)) {
+                        if (!KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId())) {
+                            throw new SecurityException("User not authorized!");// TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security
+                                                                                // reason?
+                        }
+                    }
+                } else {
+                    logger.warn("Cannot enforce Device-User bound since no device entry is found for this client id ('{}')", clientId);
+                }
 
                 // 3-4) build authMap
                 authMap = buildAuthMap(authDestinations, principal, hasPermissions, accountName, clientId, fullClientId);
