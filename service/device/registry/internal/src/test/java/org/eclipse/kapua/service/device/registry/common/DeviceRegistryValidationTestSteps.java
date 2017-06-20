@@ -353,7 +353,6 @@ public class DeviceRegistryValidationTestSteps extends AbstractKapuaSteps {
         tmpDeviceCreator.setCustomAttribute5("customAttribute5");
         tmpDeviceCreator.setDeviceUserCouplingBound(LOOSE);
         tmpDeviceCreator.setLastUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
-        tmpDeviceCreator.setReservedUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
         tmpDeviceCreator.setStatus(DeviceStatus.ENABLED);
 
         return tmpDeviceCreator;
@@ -387,7 +386,6 @@ public class DeviceRegistryValidationTestSteps extends AbstractKapuaSteps {
 
         tmpDevice.setDeviceUserCouplingBound(LOOSE);
         tmpDevice.setLastUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
-        tmpDevice.setReservedUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
         tmpDevice.setStatus(DeviceStatus.ENABLED);
 
         return tmpDevice;

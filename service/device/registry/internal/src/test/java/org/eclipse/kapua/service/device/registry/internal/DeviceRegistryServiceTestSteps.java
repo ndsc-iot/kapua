@@ -14,7 +14,6 @@ package org.eclipse.kapua.service.device.registry.internal;
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsEqualTo;
 import static org.eclipse.kapua.commons.model.query.predicate.AttributePredicate.attributeIsNotEqualTo;
 import static org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode.LOOSE;
-import static org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode.STRICT;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -362,7 +361,6 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
             throws KapuaException {
         device.setBiosVersion(device.getBiosVersion() + "_upd");
         device.setCustomAttribute1(device.getCustomAttribute1() + "_upd");
-        device.setDeviceUserCouplingBound(STRICT);
         deviceRegistryService.update(device);
     }
 
@@ -606,7 +604,6 @@ public class DeviceRegistryServiceTestSteps extends AbstractKapuaSteps {
 
         tmpDeviceCreator.setDeviceUserCouplingBound(LOOSE);
         tmpDeviceCreator.setLastUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
-        tmpDeviceCreator.setReservedUserId(new KapuaEid(BigInteger.valueOf(random.nextLong())));
 
         tmpDeviceCreator.setStatus(DeviceStatus.ENABLED);
 

@@ -157,9 +157,13 @@ public interface DevicePredicates extends KapuaUpdatableEntityPredicates {
     /**
      * Credentials mode
      */
-    public static final String CREDENTIALS_MODE = "credentialsMode";
+    public static final String DEVICE_USER_COUPLING_MODE = "deviceUserCouplingBound";
     /**
-     * Preferred user identifier
+     * Reserved user identifier
      */
-    public static final String PREFERRED_USER_ID = "preferredUserId";
+    public static final String RESERVED_USER_ID = "reservedUserId";
+    /**
+     * Last user identifier
+     */
+    public static final String LAST_USER_ID = "lastUserId";
 }

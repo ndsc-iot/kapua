@@ -50,6 +50,8 @@ import org.eclipse.kapua.broker.core.BrokerDomain;
 import org.eclipse.kapua.broker.core.message.MessageConstants;
 import org.eclipse.kapua.commons.metric.MetricServiceFactory;
 import org.eclipse.kapua.commons.metric.MetricsService;
+import org.eclipse.kapua.commons.model.query.predicate.AndPredicate;
+import org.eclipse.kapua.commons.model.query.predicate.AttributePredicate;
 import org.eclipse.kapua.commons.security.KapuaSecurityUtils;
 import org.eclipse.kapua.commons.security.KapuaSession;
 import org.eclipse.kapua.commons.setting.system.SystemSetting;
@@ -73,6 +75,10 @@ import org.eclipse.kapua.service.authorization.permission.PermissionFactory;
 import org.eclipse.kapua.service.datastore.DatastoreDomain;
 import org.eclipse.kapua.service.device.management.commons.DeviceManagementDomain;
 import org.eclipse.kapua.service.device.registry.Device;
+import org.eclipse.kapua.service.device.registry.DeviceFactory;
+import org.eclipse.kapua.service.device.registry.DeviceListResult;
+import org.eclipse.kapua.service.device.registry.DevicePredicates;
+import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.DeviceUserCouplingMode;
 import org.eclipse.kapua.service.device.registry.connection.DeviceConnection;
@@ -154,6 +160,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
     private DeviceConnectionService deviceConnectionService = KapuaLocator.getInstance().getService(DeviceConnectionService.class);
     private DeviceConnectionFactory deviceConnectionFactory = KapuaLocator.getInstance().getFactory(DeviceConnectionFactory.class);
     private DeviceRegistryService deviceRegistryService = KapuaLocator.getInstance().getService(DeviceRegistryService.class);
+    private DeviceFactory deviceFactory = KapuaLocator.getInstance().getFactory(DeviceFactory.class);
     private MetricsService metricsService = MetricServiceFactory.getInstance();
 
     public KapuaSecurityBrokerFilter(Broker next) throws KapuaException {
@@ -382,31 +389,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
 
                 // enforce the user-device bound
                 Device device = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.findByClientId(scopeId, clientId));
-                if (device != null) {
-                    DeviceUserCouplingMode deviceUserCouplingMode = device.getDeviceUserCouplingBound();
-                    if (DeviceUserCouplingMode.INHERITED.equals(device.getDeviceUserCouplingBound())) {
-                        Map<String, Object> options = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.getConfigValues(scopeId));
-                        String tmp = (String) options.get("deviceUserCouplingDefaultMode");// TODO move to constants
-                        if (tmp != null) {
-                            DeviceUserCouplingMode tmpDeviceUserCouplingMode = DeviceUserCouplingMode.valueOf(tmp);
-                            if (tmpDeviceUserCouplingMode != null) {
-                                logger.warn("Cannot parse the default Device-User coupling mode in the registry service configuration! (found '{}' - allowed values are 'LOOSE' - 'STRICT')", tmp);
-                            } else {
-                                deviceUserCouplingMode = tmpDeviceUserCouplingMode;
-                            }
-                        } else {
-                            logger.warn("Cannot find default Device-User coupling mode in the registry service configuration! (deviceUserCouplingDefaultMode)");
-                        }
-                    }
-                    if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode)) {
-                        if (!KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId())) {
-                            throw new SecurityException("User not authorized!");// TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security
-                                                                                // reason?
-                        }
-                    }
-                } else {
-                    logger.warn("Cannot enforce Device-User bound since no device entry is found for this client id ('{}')", clientId);
-                }
+                enforceDeviceUserBound(device, scopeId, clientId);
 
                 // 3-4) build authMap
                 authMap = buildAuthMap(authDestinations, principal, hasPermissions, accountName, clientId, fullClientId);
@@ -515,6 +498,60 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
             ThreadContext.unbindSubject();
             loginShiroLogoutTimeContext.stop();
             loginTotalContext.stop();
+        }
+    }
+
+    private void enforceDeviceUserBound(Device device, KapuaId scopeId, String clientId) throws KapuaException {
+        if (device != null) {
+            DeviceUserCouplingMode deviceUserCouplingMode = device.getDeviceUserCouplingBound();
+            if (DeviceUserCouplingMode.INHERITED.equals(device.getDeviceUserCouplingBound())) {
+                deviceUserCouplingMode = loadDeviceUserCouplingModeFromConfig(scopeId);
+            }
+            enforceDeviceUserBound(deviceUserCouplingMode, true, device, scopeId, clientId);
+        } else {
+            enforceDeviceUserBound(loadDeviceUserCouplingModeFromConfig(scopeId), false, device, scopeId, clientId);
+            logger.warn("Cannot enforce Device-User bound since no device entry is found for this client id ('{}') - Try using account configuration!", clientId);
+        }
+    }
+
+    private void enforceDeviceUserBound(DeviceUserCouplingMode deviceUserCouplingMode, boolean checkDeviceId, Device device, KapuaId scopeId, String clientId) throws KapuaException {
+        if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode)) {
+            if (checkDeviceId && !KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId())) {
+                throw new SecurityException("User not authorized!");
+                // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
+            }
+        } else {
+            // check that no devices have this user as strict user
+            DeviceQuery query = deviceFactory.newQuery(scopeId);
+
+            AndPredicate andPredicate = new AndPredicate();
+            andPredicate.and(new AttributePredicate<>(DevicePredicates.RESERVED_USER_ID, clientId));
+            query.setPredicate(andPredicate);
+            query.setLimit(1);
+
+            DeviceListResult result = deviceRegistryService.query(query);
+            if (!result.isEmpty()) {
+                throw new SecurityException("User not authorized!");
+                // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
+            }
+        }
+    }
+
+    private DeviceUserCouplingMode loadDeviceUserCouplingModeFromConfig(KapuaId scopeId) throws KapuaException {
+        Map<String, Object> options = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.getConfigValues(scopeId));
+        String tmp = (String) options.get("deviceUserCouplingDefaultMode");// TODO move to constants
+        if (tmp != null) {
+            DeviceUserCouplingMode tmpDeviceUserCouplingMode = DeviceUserCouplingMode.valueOf(tmp);
+            if (tmpDeviceUserCouplingMode == null) {
+                throw new SecurityException(String
+                        .format("Cannot parse the default Device-User coupling mode in the registry service configuration! (found '%s' - allowed values are 'LOOSE' - 'STRICT')", tmp));
+                // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
+            } else {
+                return tmpDeviceUserCouplingMode;
+            }
+        } else {
+            throw new SecurityException("Cannot find default Device-User coupling mode in the registry service configuration! (deviceUserCouplingDefaultMode");
+            // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
         }
     }
 
