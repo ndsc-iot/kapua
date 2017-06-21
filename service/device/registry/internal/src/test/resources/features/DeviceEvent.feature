@@ -16,9 +16,11 @@ Feature: Device Event CRUD tests
 Background:
 	Given Scope 12
 	And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
 	And A "first" device 
 	And A "second" device 
 
@@ -103,9 +105,11 @@ Scenario: Count events in scope
 	
 	Given Scope 42
 	And I configure the device service
-      | type    | name                   | value |
-      | boolean | infiniteChildEntities  | true  |
-      | integer | maxNumberChildEntities |  10   |
+      | type    | name                          | value |
+      | boolean | infiniteChildEntities         | true  |
+      | integer | maxNumberChildEntities        |  10   |
+      | boolean | deviceUserCouplingEnabled     | false |
+      | string  | deviceUserCouplingDefaultMode | LOOSE |
 	And A "third" device 
 	And I have 25 "READ" events from device "third"
 	When I count events for scope 12

@@ -604,7 +604,6 @@ public class DeviceServiceSteps extends KapuaTest {
         tmpCr.setCustomAttribute4("customAttribute4");
         tmpCr.setCustomAttribute5("customAttribute5");
         tmpCr.setDeviceUserCouplingBound(DeviceUserCouplingMode.LOOSE);
-        tmpCr.setReservedUserId(generateRandomId());
         tmpCr.setStatus(DeviceStatus.ENABLED);
 
         return tmpCr;

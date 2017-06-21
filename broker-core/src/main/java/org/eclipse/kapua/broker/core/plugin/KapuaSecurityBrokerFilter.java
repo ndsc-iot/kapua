@@ -389,7 +389,11 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
 
                 // enforce the user-device bound
                 Device device = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.findByClientId(scopeId, clientId));
-                enforceDeviceUserBound(device, scopeId, clientId);
+                Map<String, Object> options = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.getConfigValues(scopeId));
+                Boolean deviceUserCouplingEnabled = (Boolean) options.get("deviceUserCouplingEnabled");// TODO move to constants
+                if (Boolean.TRUE.equals(deviceUserCouplingEnabled)) {
+                    enforceDeviceUserBound(options, device, scopeId, userId);
+                }
 
                 // 3-4) build authMap
                 authMap = buildAuthMap(authDestinations, principal, hasPermissions, accountName, clientId, fullClientId);
@@ -501,20 +505,20 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
         }
     }
 
-    private void enforceDeviceUserBound(Device device, KapuaId scopeId, String clientId) throws KapuaException {
+    private void enforceDeviceUserBound(Map<String, Object> options, Device device, KapuaId scopeId, KapuaId userId) throws KapuaException {
         if (device != null) {
             DeviceUserCouplingMode deviceUserCouplingMode = device.getDeviceUserCouplingBound();
             if (DeviceUserCouplingMode.INHERITED.equals(device.getDeviceUserCouplingBound())) {
-                deviceUserCouplingMode = loadDeviceUserCouplingModeFromConfig(scopeId);
+                deviceUserCouplingMode = loadDeviceUserCouplingModeFromConfig(scopeId, options);
             }
-            enforceDeviceUserBound(deviceUserCouplingMode, true, device, scopeId, clientId);
+            enforceDeviceUserBound(deviceUserCouplingMode, true, device, scopeId, userId);
         } else {
-            enforceDeviceUserBound(loadDeviceUserCouplingModeFromConfig(scopeId), false, device, scopeId, clientId);
-            logger.warn("Cannot enforce Device-User bound since no device entry is found for this client id ('{}') - Try using account configuration!", clientId);
+            enforceDeviceUserBound(loadDeviceUserCouplingModeFromConfig(scopeId, options), false, device, scopeId, userId);
+            logger.warn("Cannot enforce Device-User bound since no device entry is found for this user id ('{}') - Try using account configuration!", userId);
         }
     }
 
-    private void enforceDeviceUserBound(DeviceUserCouplingMode deviceUserCouplingMode, boolean checkDeviceId, Device device, KapuaId scopeId, String clientId) throws KapuaException {
+    private void enforceDeviceUserBound(DeviceUserCouplingMode deviceUserCouplingMode, boolean checkDeviceId, Device device, KapuaId scopeId, KapuaId userId) throws KapuaException {
         if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode)) {
             if (checkDeviceId && !KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId())) {
                 throw new SecurityException("User not authorized!");
@@ -525,11 +529,11 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
             DeviceQuery query = deviceFactory.newQuery(scopeId);
 
             AndPredicate andPredicate = new AndPredicate();
-            andPredicate.and(new AttributePredicate<>(DevicePredicates.RESERVED_USER_ID, clientId));
+            andPredicate.and(new AttributePredicate<>(DevicePredicates.RESERVED_USER_ID, userId));
             query.setPredicate(andPredicate);
             query.setLimit(1);
 
-            DeviceListResult result = deviceRegistryService.query(query);
+            DeviceListResult result = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.query(query));
             if (!result.isEmpty()) {
                 throw new SecurityException("User not authorized!");
                 // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
@@ -537,8 +541,7 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
         }
     }
 
-    private DeviceUserCouplingMode loadDeviceUserCouplingModeFromConfig(KapuaId scopeId) throws KapuaException {
-        Map<String, Object> options = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.getConfigValues(scopeId));
+    private DeviceUserCouplingMode loadDeviceUserCouplingModeFromConfig(KapuaId scopeId, Map<String, Object> options) throws KapuaException {
         String tmp = (String) options.get("deviceUserCouplingDefaultMode");// TODO move to constants
         if (tmp != null) {
             DeviceUserCouplingMode tmpDeviceUserCouplingMode = DeviceUserCouplingMode.valueOf(tmp);
