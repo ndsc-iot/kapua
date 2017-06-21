@@ -76,7 +76,6 @@ import org.eclipse.kapua.service.datastore.DatastoreDomain;
 import org.eclipse.kapua.service.device.management.commons.DeviceManagementDomain;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
-import org.eclipse.kapua.service.device.registry.DeviceListResult;
 import org.eclipse.kapua.service.device.registry.DevicePredicates;
 import org.eclipse.kapua.service.device.registry.DeviceQuery;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
@@ -511,19 +510,18 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
             if (DeviceUserCouplingMode.INHERITED.equals(device.getDeviceUserCouplingBound())) {
                 deviceUserCouplingMode = loadDeviceUserCouplingModeFromConfig(scopeId, options);
             }
-            enforceDeviceUserBound(deviceUserCouplingMode, true, device, scopeId, userId);
+            enforceDeviceUserBound(deviceUserCouplingMode, false, device, scopeId, userId);
         } else {
-            enforceDeviceUserBound(loadDeviceUserCouplingModeFromConfig(scopeId, options), false, device, scopeId, userId);
+            enforceDeviceUserBound(loadDeviceUserCouplingModeFromConfig(scopeId, options), true, device, scopeId, userId);
             logger.warn("Cannot enforce Device-User bound since no device entry is found for this user id ('{}') - Try using account configuration!", userId);
         }
     }
 
-    private void enforceDeviceUserBound(DeviceUserCouplingMode deviceUserCouplingMode, boolean checkDeviceId, Device device, KapuaId scopeId, KapuaId userId) throws KapuaException {
-        if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode)) {
-            if (checkDeviceId && !KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId())) {
-                throw new SecurityException("User not authorized!");
-                // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
-            }
+    private void enforceDeviceUserBound(DeviceUserCouplingMode deviceUserCouplingMode, boolean strictNotAllowed, Device device, KapuaId scopeId, KapuaId userId) throws KapuaException {
+        if (DeviceUserCouplingMode.STRICT.equals(deviceUserCouplingMode) &&
+                (strictNotAllowed || !KapuaSecurityUtils.getSession().getUserId().equals(device.getReservedUserId()))) {
+            throw new SecurityException("User not authorized!");
+            // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
         } else {
             // check that no devices have this user as strict user
             DeviceQuery query = deviceFactory.newQuery(scopeId);
@@ -533,8 +531,8 @@ public class KapuaSecurityBrokerFilter extends BrokerFilter {
             query.setPredicate(andPredicate);
             query.setLimit(1);
 
-            DeviceListResult result = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.query(query));
-            if (!result.isEmpty()) {
+            Long result = KapuaSecurityUtils.doPrivileged(() -> deviceRegistryService.count(query));
+            if (result != null && result > 0) {
                 throw new SecurityException("User not authorized!");
                 // TODO manage the error message. is it better to throw a more specific exception or keep it obfuscated for security reason?
             }
