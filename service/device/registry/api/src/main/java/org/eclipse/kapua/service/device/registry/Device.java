@@ -59,22 +59,7 @@ import org.eclipse.kapua.service.device.registry.event.DeviceEvent;
         "customAttribute2",
         "customAttribute3",
         "customAttribute4",
-        "customAttribute5",
-        "credentialsMode",
-        "preferredUserId"
-        // // derived attributes
-        // "uptime",
-        // "modelName",
-        // "partNumber",
-        // "availableProcessors",
-        // "totalMemory",
-        // "os",
-        // "osArch",
-        // "jvmName",
-        // "jvmProfile",
-        // "osgiFramework",
-        // "connectionInterface",
-        // "gpsAltitude"
+        "customAttribute5"
 }, factoryClass = DeviceXmlRegistry.class, factoryMethod = "newDevice")
 public interface Device extends KapuaUpdatableEntity {
 
@@ -462,94 +447,4 @@ public interface Device extends KapuaUpdatableEntity {
      * @param customAttribute5
      */
     public void setCustomAttribute5(String customAttribute5);
-
-    /**
-     * Get credentials mode.<br>
-     * The device credential mode sets a security level for the devices, setting a specific user connection policy between the available policies.
-     * 
-     * @return
-     */
-    @XmlElement(name = "deviceCredentialsMode")
-    public DeviceCredentialsMode getCredentialsMode();
-
-    /**
-     * Set credentials mode.<br>
-     * The device credential mode sets a security level for the devices, setting a specific user connection policy between the available policies.
-     * 
-     * @param credentialsMode
-     */
-    public void setCredentialsMode(DeviceCredentialsMode credentialsMode);
-
-    /**
-     * Get preferred user identifier.<br>
-     * Set the preferred user identifier that can connect to this device.
-     * 
-     * @return
-     */
-    @XmlElement(name = "preferredUserId")
-    @XmlJavaTypeAdapter(KapuaIdAdapter.class)
-    public KapuaId getPreferredUserId();
-
-    /**
-     * Set preferred user identifier.<br>
-     * Set the preferred user identifier that can connect to this device.
-     * 
-     * @param deviceUserId
-     */
-    public void setPreferredUserId(KapuaId deviceUserId);
-
-    /*
-     * // --------------------------
-     * //
-     * // non-indexed properties
-     * //
-     * // --------------------------
-     * public long getUptime();
-     * 
-     * public void setUptime(long uptime);
-     * 
-     * public String getModelName();
-     * 
-     * public void setModelName(String modelName);
-     * 
-     * public String getPartNumber();
-     * 
-     * public void setPartNumber(String partNumber);
-     * 
-     * public String getAvailableProcessors();
-     * 
-     * public void setAvailableProcessors(String availableProcessors);
-     * 
-     * public String getTotalMemory();
-     * 
-     * public void setTotalMemory(String totalMemory);
-     * 
-     * public String getOs();
-     * 
-     * public void setOs(String os);
-     * 
-     * public String getOsArch();
-     * 
-     * public void setOsArch(String osArch);
-     * 
-     * public String getJvmName();
-     * 
-     * public void setJvmName(String jvmName);
-     * 
-     * public String getJvmProfile();
-     * 
-     * public void setJvmProfile(String jvmProfile);
-     * 
-     * public String getOsgiFramework();
-     * 
-     * public void setOsgiFramework(String osgiFramework);
-     * 
-     * public String getConnectionInterface();
-     * 
-     * public void setConnectionInterface(String connectionInterface);
-     * 
-     * public Double getGpsAltitude();
-     * 
-     * public void setGpsAltitude(Double gpsAltitude);
-     */
 }

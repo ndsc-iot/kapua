@@ -26,7 +26,6 @@ import org.eclipse.kapua.model.id.KapuaId;
 import org.eclipse.kapua.service.device.management.response.KapuaResponseCode;
 import org.eclipse.kapua.service.device.registry.Device;
 import org.eclipse.kapua.service.device.registry.DeviceCreator;
-import org.eclipse.kapua.service.device.registry.DeviceCredentialsMode;
 import org.eclipse.kapua.service.device.registry.DeviceFactory;
 import org.eclipse.kapua.service.device.registry.DeviceRegistryService;
 import org.eclipse.kapua.service.device.registry.event.DeviceEventCreator;
@@ -75,7 +74,6 @@ public class DeviceLifeCycleServiceImpl implements DeviceLifeCycleService {
             deviceCreator.setApplicationFrameworkVersion(payload.getApplicationFrameworkVersion());
             deviceCreator.setApplicationIdentifiers(payload.getApplicationIdentifiers());
             deviceCreator.setAcceptEncoding(payload.getAcceptEncoding());
-            deviceCreator.setCredentialsMode(DeviceCredentialsMode.LOOSE);
 
             // issue #57
             deviceCreator.setConnectionId(connectionId);
