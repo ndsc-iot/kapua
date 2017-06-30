@@ -62,7 +62,7 @@ public interface DeviceConnectionCreator extends KapuaUpdatableEntityCreator<Dev
     /**
      * Set the device connection user coupling mode.
      *
-     * @param status
+     * @param userCouplingMode
      */
     public void setUserCouplingMode(ConnectionUserCouplingMode userCouplingMode);
 
